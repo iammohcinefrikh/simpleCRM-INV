@@ -1,8 +1,11 @@
 import React from "react";
+import addClient from "./AddClient";
+import AddClient from "./AddClient";
 
 class AddInvoiceDetails extends React.Component {
   constructor(props) {
     super(props);
+    // initializing state variables
     this.state = {
       invoiceParty: "Sélectionner un client...",
       invoiceNumber: "",
@@ -14,22 +17,27 @@ class AddInvoiceDetails extends React.Component {
       isButtonActive: false
     };
 
+    // binding methods to the class instance
     this.validateInput = this.validateInput.bind(this);
     this.addItem = this.addItem.bind(this);
     this.addClient = this.addClient.bind(this);
   }
 
+  // method to handle input change
   handleChange = (event) => {
     let { name: inputName, value: inputValue } = event.target;
 
+    // show add client dialog if user selects to insert a client
     if(inputName === "invoiceParty" && inputValue === "+ Insérer un client") {
       const addClientDialog = document.getElementById("addClientDialog");
       return addClientDialog.showModal();
     }
 
+    // updating state with new input value
     this.setState({ [inputName]: inputValue });
   };
 
+  // method to validate input values
   validateInput = (event) => {
     let { name: inputName, value: inputValue } = event.target;
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(\d{4})$/;
@@ -72,6 +80,7 @@ class AddInvoiceDetails extends React.Component {
     }
   }
 
+  // method to add a new item to the invoice
   addItem = () => {
     const { isButtonActive } = this.state;
     const { updateState, items, availableItems } = this.props;
@@ -92,6 +101,7 @@ class AddInvoiceDetails extends React.Component {
     }
   };
 
+  // method to create a new invoice
   createInvoice = () => {
     const { invoiceNumber, invoiceDate, invoiceParty } = this.state;
     const { handleInvoicesUpdate, items, updateState } = this.props;
@@ -104,7 +114,6 @@ class AddInvoiceDetails extends React.Component {
 
     if(storedInvoices) {
       for (const invoice of storedInvoices) {
-        console.log(invoice);
         if(Number(invoice.invoiceNumber) === Number(invoiceNumber)) {
           return alert("Le numéro de facture que vous avez choisi est déjà pris, choisissez-en un autre et réessayez.");
         }
@@ -145,8 +154,9 @@ class AddInvoiceDetails extends React.Component {
     alert("Facture ajoutée avec succès.");
   }
 
+  // method to add a new client
   addClient = () => {
-    const { availableClients } = this.props;
+    const { availableClients, updateState } = this.props;
     const { clientName, clientEmail, clientPhone, clientAddress } = this.state;
     const storedClients = JSON.parse(localStorage.getItem("clientStorage"));
     const addClientDialog = document.getElementById("addClientDialog");
@@ -166,8 +176,11 @@ class AddInvoiceDetails extends React.Component {
     const updatedClients = [...availableClients, client];
     localStorage.setItem("clientStorage", JSON.stringify(updatedClients));
 
+    updateState({
+      availableClients: updatedClients
+    });
+
     this.setState({
-      availableClients: updatedClients,
       invoiceParty: clientName,
       clientName: "",
       clientEmail: "",
@@ -184,7 +197,7 @@ class AddInvoiceDetails extends React.Component {
     const { isButtonActive } = this.state;
 
     return (
-      <div className="invoice-details-container">
+      <div className="add-invoice-details-container">
         {/* invoice number input */}
         <div className="input-container">
           <label htmlFor="invoiceNumberInput" className="input-label">Numéro de facture</label>
@@ -214,6 +227,7 @@ class AddInvoiceDetails extends React.Component {
 
         {/* add invoice button */}
         <button id="insertInvoiceButton" className={`${isButtonActive ? "primary-button" : "primary-button disabled-button"}`} onClick={this.createInvoice} disabled={!items.length}>Établir la facture</button>
+        <AddClient handleChange={this.handleChange} validateInput={this.validateInput} clientName={this.state.clientName} clientEmail={this.state.clientEmail} clientPhone={this.state.clientPhone} clientAddress={this.state.clientAddress} addClient={this.addClient} />
       </div>
     );
   }

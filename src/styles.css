@@ -12,20 +12,22 @@
 }
 
 * {
-  font-family: "Inter",sans-serif;
+  font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
-  font-variation-settings: "slnt"0;
+  font-variation-settings: "slnt" 0;
   box-sizing: border-box;
 }
 
+body, p {
+  margin: 0
+}
+
 body {
-  margin: 0;
   display: flex;
   background-color: var(--grey-color);
 }
 
 p {
-  margin: 0;
   display: inline-block;
 }
 
@@ -44,20 +46,23 @@ p {
 .main-container {
   width: 1280px;
   max-width: 100%;
-  margin: 80px auto 80px;
+  margin: 80px auto;
+}
+
+.add-invoice-container, table {
+  width: 100%;
+  border: 1px solid var(--dark-grey-color);
 }
 
 .add-invoice-container {
   display: flex;
   flex-direction: column;
-  width: 100%;
   padding: 44px;
   border-radius: 8px;
-  border: 1px solid var(--dark-grey-color);
   background: var(--white-color);
 }
 
-.invoice-details-container {
+.add-invoice-details-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   grid-column-gap: 24px;
@@ -65,13 +70,24 @@ p {
   align-items: end;
 }
 
-.invoice-list-container {
+.invoice-details-container, .invoice-list-container {
   width: 100%;
   margin-top: 44px;
   padding: 44px;
   border-radius: 8px;
   border: 1px solid var(--dark-grey-color);
   background: var(--white-color);
+}
+
+.invoice-list-container table tbody tr td button {
+  border: 0;
+  color: var(--red-color);
+  background-color: transparent;
+  font-weight: 500;
+}
+
+.invoice-list-container table tbody tr td button:hover, .primary-button:hover, .secondary-button:hover {
+  cursor: pointer;
 }
 
 .input-container {
@@ -84,11 +100,14 @@ p {
   line-height: 20px;
 }
 
+.input-field, .input-select {
+  font-size: 14px;
+}
+
 .input-field, .input-select, .primary-button, .secondary-button {
   width: 100%;
   height: 44px;
   border-radius: 8px;
-  font-size: 14px;
 }
 
 .input-field, .input-select {
@@ -100,26 +119,21 @@ p {
 .primary-button, .secondary-button {
   font-weight: 500;
   font-size: 14px;
-  border: none;
+  border: 0;
 }
 
-.primary-button {
+.disabled-button, .primary-button {
   background-color: var(--red-color);
   color: var(--white-color);
 }
 
 .disabled-button {
   background-color: var(--background-grey-color);
-  color: var(--white-color);
 }
 
 .secondary-button {
-  background-color: rgba(206, 0, 51, 0.10);
+  background-color: rgba(206, 0, 51, .1);
   color: var(--red-color);
-}
-
-.primary-button:hover, .secondary-button:hover {
-    cursor: pointer;
 }
 
 .disabled-button:hover {
@@ -127,35 +141,33 @@ p {
 }
 
 table {
-  width: 100%;
   table-layout: fixed;
-  border: 1px solid var(--dark-grey-color);
   border-radius: 5px;
   border-spacing: 0;
   overflow: hidden;
 }
 
-th {
+td, th {
   height: 44px;
+  padding-left: 24px;
+  border-bottom: 1px solid var(--dark-grey-color);
+}
+
+th {
   background-color: var(--light-grey-color);
   text-align: left;
-  padding-left: 24px;
   color: var(--background-grey-color);
   font-size: 12px;
   font-weight: 500;
   line-height: 20px;
-  border-bottom: 1px solid var(--dark-grey-color);
 }
 
 td {
-  height: 44px;
-  padding-left: 24px;
-  border-bottom: 1px solid var(--dark-grey-color);
   font-size: 14px;
 }
 
 tr:last-of-type td {
-  border: none !important;
+  border: 0 !important;
 }
 
 .item-container {
@@ -164,7 +176,7 @@ tr:last-of-type td {
   margin-top: 44px;
 }
 
-.item-container-header {
+.item, .item-container-header {
   display: flex;
   justify-content: space-between;
   gap: 24px;
@@ -172,25 +184,22 @@ tr:last-of-type td {
 
 .item-container-header p {
   width: 100%;
-  flex: 1;
+  flex: 1
 }
 
 .item {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 18px;
-  gap: 24px;
+  margin-top: 18px
 }
 
 .item-container div:nth-of-type(2) {
-  margin-top: 0;
+  margin-top: 0
 }
 
 .add-client-dialog {
   padding: 24px;
   width: 400px;
-  border: none;
-  border-radius: 12px;
+  border: 0;
+  border-radius: 12px
 }
 
 dialog::backdrop {
@@ -201,4 +210,40 @@ dialog::backdrop {
 .action-buttons-container {
   display: flex;
   gap: 12px;
+}
+
+.invoice-details-total-container {
+  width: 240px;
+  height: auto;
+  margin: 44px 0 0 auto;
+}
+
+.invoice-details-total-header, .invoice-details-total-value {
+  display: flex;
+  height: 44px;
+  border: 1px solid var(--dark-grey-color);
+  padding: 12px 24px;
+  align-items: center;
+}
+
+.invoice-details-total-header {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: var(--light-grey-color);
+}
+
+.invoice-details-total-header p {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--background-grey-color);
+}
+
+.invoice-details-total-value {
+  border-top: none;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.invoice-details-total-value p {
+  font-size: 14px;
 }

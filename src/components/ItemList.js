@@ -7,6 +7,7 @@ class ItemList extends React.Component {
 
     return (
       <div className="item-container">
+        {/* header row for the item list */}
         <div className="item-container-header">
           <p>Article</p>
           <p>Quantité</p>
@@ -14,8 +15,17 @@ class ItemList extends React.Component {
           <p>Remise (%)</p>
           <p>Montant (DH)</p>
         </div>
+        {/* mapping through items and rendering each Item component */}
         {items.map((item, index) => (
-          <Item key={index} index={index} item={item} items={items} availableItems={availableItems} selectedItems={selectedItems} updateItem={updateItem} />
+          <Item 
+            key={index} 
+            index={index} 
+            item={item} 
+            items={items} 
+            availableItems={availableItems} 
+            selectedItems={selectedItems} 
+            updateItem={updateItem} 
+          />
         ))}
       </div>
     );

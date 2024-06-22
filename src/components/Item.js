@@ -28,9 +28,11 @@ class Item extends React.Component {
     const { index, updateItem } = this.props;
     const { item } = this.props;
     const itemQuantity = event.target.value;
+    const itemName = item.itemName;
     const itemTotal = (item.itemPrice * itemQuantity) * (1 - item.itemDiscount / 100);
 
     if(itemQuantity === "" || itemQuantity === "0" || isNaN(itemQuantity)) {
+      console.log("exception triggered");
       const updates = {
         itemQuantity: "1",
         itemTotal: (item.itemPrice * 1) * (1 - item.itemDiscount / 100).toFixed(2)
@@ -39,12 +41,22 @@ class Item extends React.Component {
       return updateItem(index, updates);
     }
 
-    const updates = {
-      itemQuantity: itemQuantity,
-      itemTotal: itemTotal.toFixed(2)
+    if(!itemName) {
+      const updates = {
+        itemQuantity: itemQuantity
+      }
+
+      updateItem(index, updates);
     }
 
-    updateItem(index, updates);
+    else {
+      const updates = {
+        itemQuantity: itemQuantity,
+        itemTotal: itemTotal.toFixed(2)
+      }
+
+      updateItem(index, updates);
+    }
   };
 
   render() {

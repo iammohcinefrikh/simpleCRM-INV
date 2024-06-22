@@ -1,6 +1,7 @@
 import React from "react";
 import AddInvoiceDetails from "./AddInvoiceDetails";
 import InvoiceList from "./InvoiceList";
+import CreateInvoice from "./CreateInvoice";
 import "../styles.css";
 
 class App extends React.Component {
@@ -175,10 +176,12 @@ class App extends React.Component {
   };
   
   render() {
+    const { availableInvoices } = this.state;
+
     return (
       <main id="mainContainer" className="main-container">
-        <AddInvoiceDetails availableInvoices={this.state.availableInvoices} handleInvoicesUpdate={this.handleInvoicesUpdate} />
-        <InvoiceList availableInvoices={this.state.availableInvoices} />
+        <CreateInvoice availableInvoices={availableInvoices} handleInvoicesUpdate={this.handleInvoicesUpdate} />
+        <InvoiceList availableInvoices={availableInvoices} />
       </main>
     );
   }

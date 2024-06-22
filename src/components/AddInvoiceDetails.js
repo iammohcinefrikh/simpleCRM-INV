@@ -1,15 +1,9 @@
 import React from "react";
-import ItemList from "./ItemList";
-import AddClient from "./AddClient";
 
 class AddInvoiceDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [],
-      selectedItems: new Set(),
-      availableItems: [],
-      availableClients: [],
       invoiceParty: "Sélectionner un client...",
       invoiceNumber: "",
       invoiceDate: "",
@@ -17,63 +11,13 @@ class AddInvoiceDetails extends React.Component {
       clientEmail: "",
       clientPhone: "",
       clientAddress: "",
-      showItemsContainer: false,
       isButtonActive: false
     };
 
-    this.addItem = this.addItem.bind(this);
     this.validateInput = this.validateInput.bind(this);
+    this.addItem = this.addItem.bind(this);
     this.addClient = this.addClient.bind(this);
   }
-
-  componentDidMount() {
-    const storedItems = localStorage.getItem("itemStorage");
-    const storedClients = localStorage.getItem("clientStorage");
-
-    if(storedItems) {
-      this.setState({ availableItems: JSON.parse(storedItems) });
-    }
-
-    if(storedClients) {
-      this.setState({ availableClients: JSON.parse(storedClients) });
-    }
-  }
-
-  addItem = () => {
-    const { isButtonActive } = this.state;
-
-    if(!isButtonActive) {
-      this.setState({
-        isButtonActive: true
-      });
-    }
-
-    if(this.state.items.length < this.state.availableItems.length) {
-      this.setState((prevState) => ({
-        items: prevState.items.length === 0 ? [{ itemId: "", itemName: "", itemQuantity: "", itemPrice: "", itemDiscount: "", itemTotal: "" }] : [...prevState.items, { itemId: "", itemName: "", itemQuantity: "", itemPrice: "", itemDiscount: "", itemTotal: "" }],
-        showItemsContainer: true
-      }));
-    }
-  };
-
-  updateItem = (index, updates) => {
-    const updatedItems = this.state.items.map((item, i) =>
-      i === index ? { ...item, ...updates } : item
-    );
-    this.setState({ items: updatedItems }, () => {
-      this.updateSelectedItems();
-    });
-  };
-
-  updateSelectedItems = () => {
-    const selectedItems = new Set();
-    this.state.items.forEach((item) => {
-      if (item.itemName !== "") {
-        selectedItems.add(item.itemName);
-      }
-    });
-    this.setState({ selectedItems });
-  };
 
   handleChange = (event) => {
     let { name: inputName, value: inputValue } = event.target;
@@ -128,9 +72,29 @@ class AddInvoiceDetails extends React.Component {
     }
   }
 
+  addItem = () => {
+    const { isButtonActive } = this.state;
+    const { updateState, items, availableItems } = this.props;
+
+    if(!isButtonActive) {
+      this.setState({
+        isButtonActive: true
+      });
+    }
+
+    if (items.length < availableItems.length) {
+      const newItems = items.length === 0 ? [{ itemId: "", itemName: "", itemQuantity: "", itemPrice: "", itemDiscount: "", itemTotal: "" }] : [...items, { itemId: "", itemName: "", itemQuantity: "", itemPrice: "", itemDiscount: "", itemTotal: "" }];
+
+      updateState({
+        items: newItems,
+        showItemsContainer: true
+      });
+    }
+  };
+
   createInvoice = () => {
-    const { invoiceNumber, invoiceDate, invoiceParty, items } = this.state;
-    const { availableInvoices, handleInvoicesUpdate } = this.props;
+    const { invoiceNumber, invoiceDate, invoiceParty } = this.state;
+    const { handleInvoicesUpdate, items, updateState } = this.props;
     const storedInvoices = JSON.parse(localStorage.getItem("invoiceStorage"));
     const errorMessage = "Une erreur s'est produite, vérifiez les informations manquantes sur votre facture et réessayez."
 
@@ -166,10 +130,13 @@ class AddInvoiceDetails extends React.Component {
 
     handleInvoicesUpdate("availableInvoices", storedInvoices);
 
-    this.setState({
+    updateState({
       showItemsContainer: false,
       items: [],
-      selectedItems: new Set(),
+      selectedItems: new Set()
+    });
+
+    this.setState({
       invoiceParty: "Sélectionner un client...",
       invoiceNumber: "",
       invoiceDate: ""
@@ -179,7 +146,8 @@ class AddInvoiceDetails extends React.Component {
   }
 
   addClient = () => {
-    const { clientName, clientEmail, clientPhone, clientAddress, availableClients } = this.state;
+    const { availableClients } = this.props;
+    const { clientName, clientEmail, clientPhone, clientAddress } = this.state;
     const storedClients = JSON.parse(localStorage.getItem("clientStorage"));
     const addClientDialog = document.getElementById("addClientDialog");
 
@@ -211,46 +179,41 @@ class AddInvoiceDetails extends React.Component {
   }
 
   render() {
-    const allItemsSelected = this.state.items.length >= this.state.availableItems.length;
-    const { availableClients, items, isButtonActive } = this.state;
+    const allItemsSelected = this.props.items.length >= this.props.availableItems.length;
+    const { availableClients, items } = this.props;
+    const { isButtonActive } = this.state;
 
     return (
-      <div className="add-invoice-container">
-        <div className="invoice-details-container">
-          {/* invoice number input */}
-          <div className="input-container">
-            <label htmlFor="invoiceNumberInput" className="input-label">Numéro de facture</label>
-            <input id="invoiceNumberInput" className="input-field mt-6" name="invoiceNumber" placeholder="01" value={this.state.invoiceNumber} onChange={this.handleChange} onBlur={this.validateInput} required />
-          </div>
-
-          {/* invoice date input */}
-          <div className="input-container">
-            <label htmlFor="invoiceDateInput" className="input-label">Date de facture</label>
-            <input id="invoiceDateInput" className="input-field mt-6" name="invoiceDate" type="text" placeholder="DD/MM/YYYY" value={this.state.invoiceDate} onChange={this.handleChange} onBlur={this.validateInput} required />
-          </div>
-
-          {/* invoice party select */}
-          <div className="input-container">
-            <label htmlFor="invoicePartySelect" className="input-label">Facturé à</label>
-            <select id="invoicePartySelect" className="input-select mt-6" name="invoiceParty" value={this.state.invoiceParty} onChange={this.handleChange} onBlur={this.validateInput} required>
-              <option value={"Sélectionner un client..."} disabled>Sélectionner un client...</option>
-              {availableClients.map((availableClient) => {
-                return <option key={availableClient.clientId} value={availableClient.clientName}>{availableClient.clientName}</option>
-              })}
-              <option value={"+ Insérer un client"}>+ Insérer un client</option>
-            </select>
-          </div>
-
-          {/* add item buttons */}
-          <button id="addItemButton" className="secondary-button" onClick={this.addItem} disabled={allItemsSelected}>Insérer un article</button>
-
-          {/* add invoice button */}
-          <button id="insertInvoiceButton" className={`${isButtonActive ? "primary-button" : "primary-button disabled-button"}`} onClick={this.createInvoice} disabled={!items.length}>Établir la facture</button>
+      <div className="invoice-details-container">
+        {/* invoice number input */}
+        <div className="input-container">
+          <label htmlFor="invoiceNumberInput" className="input-label">Numéro de facture</label>
+          <input id="invoiceNumberInput" className="input-field mt-6" name="invoiceNumber" placeholder="01" value={this.state.invoiceNumber} onChange={this.handleChange} onBlur={this.validateInput} required />
         </div>
-        {/* ItemsContainer component */}
-        {this.state.showItemsContainer && (<ItemList items={this.state.items} availableItems={this.state.availableItems} selectedItems={this.state.selectedItems} updateItem={this.updateItem} />)}
-        {/* AddClient component */}
-        <AddClient handleChange={this.handleChange} validateInput={this.validateInput} clientName={this.state.clientName} clientEmail={this.state.clientEmail} clientPhone={this.state.clientPhone} clientAddress={this.state.clientAddress} addClient={this.addClient} />
+
+        {/* invoice date input */}
+        <div className="input-container">
+          <label htmlFor="invoiceDateInput" className="input-label">Date de facture</label>
+          <input id="invoiceDateInput" className="input-field mt-6" name="invoiceDate" type="text" placeholder="DD/MM/YYYY" value={this.state.invoiceDate} onChange={this.handleChange} onBlur={this.validateInput} required />
+        </div>
+
+        {/* invoice party select */}
+        <div className="input-container">
+          <label htmlFor="invoicePartySelect" className="input-label">Facturé à</label>
+          <select id="invoicePartySelect" className="input-select mt-6" name="invoiceParty" value={this.state.invoiceParty} onChange={this.handleChange} onBlur={this.validateInput} required>
+            <option value={"Sélectionner un client..."} disabled>Sélectionner un client...</option>
+            {availableClients.map((availableClient) => {
+              return <option key={availableClient.clientId} value={availableClient.clientName}>{availableClient.clientName}</option>
+            })}
+            <option value={"+ Insérer un client"}>+ Insérer un client</option>
+          </select>
+        </div>
+
+        {/* add item buttons */}
+        <button id="addItemButton" className="secondary-button" onClick={this.addItem} disabled={allItemsSelected}>Insérer un article</button>
+
+        {/* add invoice button */}
+        <button id="insertInvoiceButton" className={`${isButtonActive ? "primary-button" : "primary-button disabled-button"}`} onClick={this.createInvoice} disabled={!items.length}>Établir la facture</button>
       </div>
     );
   }

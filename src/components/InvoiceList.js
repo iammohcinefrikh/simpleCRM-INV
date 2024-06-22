@@ -6,7 +6,7 @@ class InvoiceList extends React.Component {
     invoiceItems.forEach(item => {
       total += parseFloat(item.itemTotal);
     });
-    return total;
+    return total.toFixed(2);
   }
 
   render() {
